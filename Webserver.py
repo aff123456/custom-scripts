@@ -1,4 +1,4 @@
-from http.server import BaseHTTPRequestHandler,HTTPServer
+from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 from collections import OrderedDict
 from datetime import timedelta
 PORT_NUMBER = 8080
@@ -45,11 +45,19 @@ class myHandler(BaseHTTPRequestHandler):
                         meminfo = meminfo()
                         self.wfile.write("<body><p>%s</p>" %'Memoria Ram Total: {0}'.format(meminfo['MemTotal']))
                         self.wfile.write("<body><p>%s</p>" %'Memoria Ram Livre: {0}'.format(meminfo['MemFree']))
+                def process_list():
+                        pids = []
+			for subdir in os.listdir('/proc'):
+                                if subdir.isdigit():
+                                        pids.append(subdir)
+                        return pids
+                pids = process_list()
+                self.wfile.write("<body><p>%s</p>" %'Processos em execucao: {0}'.format(len(pids)))
                
 try:
         server = HTTPServer(('', PORT_NUMBER), myHandler)
-        print('Started httpserver on port ' , PORT_NUMBER)
+        print 'Started httpserver on port ' , PORT_NUMBER
         server.serve_forever()
 except KeyboardInterrupt:
-        print('^C received, shutting down the web server')
+        print '^C received, shutting down the web server'
 server.socket.close()
